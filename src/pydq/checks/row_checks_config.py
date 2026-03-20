@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Any, Dict, Optional, List
+from decimal import Decimal
 from .base_check_config import CheckConfig
 
 ################################        
@@ -79,11 +80,60 @@ class DateMinCheck(CheckConfig):
         super().__post_init__()
         #Pendiente validaciones adicionales
 
+##########################################        
+##### ExactlyOneNotNullCheckConfig #######
+##########################################
+@dataclass(kw_only=True)
+class ExactlyOneNotNullCheckConfig(CheckConfig):
+    columns: List[str]
+    sparkdq_check: str = field(default="exactly-one-not-null-check", init=False, repr=False)
+
+    def __post_init__(self):
+        super().__post_init__()
+        #Pendiente otras validaciones
+
+##########################################        
+######### IsContainedInCheck #############
+##########################################
+@dataclass(kw_only=True)
+class IsContainedInCheck(CheckConfig):
+    allowed_values: dict[str, list[object]]
+    sparkdq_check: str = field(default="is-contained-in-check", init=False, repr=False)
+
+    def __post_init__(self):
+        super().__post_init__()
+        #Pendiente otras validaciones
+
+##########################################        
+######### IsNotContainedInCheck ##########
+##########################################
+@dataclass(kw_only=True)
+class IsNotContainedInCheck(CheckConfig):
+    forbidden_values: dict[str, list[object]]
+    sparkdq_check: str = field(default="is-not-contained-in-check", init=False, repr=False)
+
+    def __post_init__(self):
+        super().__post_init__()
+        #Pendiente otras validaciones
+
 ################################        
-##### NotNullCkeckConfig #######
+##### NotNullCheck #######
 ################################
 @dataclass(kw_only=True)
-class NotNullCkeckConfig(CheckConfig):
+class NotNullCheck(CheckConfig):
+    columns: List[str]
+    sparkdq_check: str = field(default="not-null-check", init=False, repr=False)
+    
+    def __post_init__(self):
+        super().__post_init__()
+        if len(self.columns) == 0:
+            raise ValueError("'columns' debe ser una lista no vacía.")
+        
+################################        
+######### NullCheck ###########
+################################
+@dataclass(kw_only=True)
+class NullCheck(CheckConfig):
     columns: List[str]
     sparkdq_check: str = field(default="null-check", init=False, repr=False)
     
@@ -93,12 +143,15 @@ class NotNullCkeckConfig(CheckConfig):
             raise ValueError("'columns' debe ser una lista no vacía.")
         
 ##########################################        
-##### ExactlyOneNotNullCheckConfig #######
+######### NumericBetweenCheck ##########
 ##########################################
 @dataclass(kw_only=True)
-class ExactlyOneNotNullCheckConfig(CheckConfig):
+class NumericBetweenCheck(CheckConfig):
     columns: List[str]
-    sparkdq_check: str = field(default="exactly-one-not-null-check", init=False, repr=False)
+    min_value: float | int | Decimal
+    max_value: float | int | Decimal
+    inclusive:  tuple[bool, bool] = (False, False)
+    sparkdq_check: str = field(default="numeric-between-check", init=False, repr=False)
 
     def __post_init__(self):
         super().__post_init__()

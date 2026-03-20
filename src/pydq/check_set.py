@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Iterable, Optional, Union
 import json
 from pathlib import Path
-from .checks.row_checks import CheckConfig 
+from pydq.checks.base_check_config import CheckConfig 
 
 @dataclass
 class CheckSetConfig:

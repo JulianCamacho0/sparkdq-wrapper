@@ -2,7 +2,7 @@ import time
 import json
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Sequence, Union
-from .check_set import CheckSetConfig
+from pydq.check_set import CheckSetConfig
 
 class SparkDQRunner:
     """
