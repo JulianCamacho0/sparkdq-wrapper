@@ -1,6 +1,6 @@
 from dataclasses import dataclass, asdict, field
 from typing import Any, Dict, Optional, Literal, List
-
+from datetime import datetime
 Severity = Literal["critical", "warning"]
 
 def clean_none(d: dict) -> dict:
@@ -65,7 +65,78 @@ class CheckConfig:
     @staticmethod
     def _require_str(value: Any, field: str):
         if not isinstance(value, str) or not value.strip():
-            raise ValueError(f"'{field}' debe ser un string no vacío.")
+            raise ValueError(f"{field} debe ser un string no vacío.")
+        
+    @staticmethod
+    def _validate_date(value: Any, field: str):
+        if not isinstance(value, str):
+            raise ValueError(f'{field} debe ser un string en YYYY-MM-DD formato.')
+        try:
+            datetime.strptime(value, "%Y-%m-%d").date()
+        except:
+             raise ValueError(f'{field} debe estar en formato YYYY-MM-DD')
+        
+    @staticmethod
+    def _validate_columns(value: Any):
+         
+         if not isinstance(value, List):
+            raise ValueError('columns debe ser de tipo Lis.')
+         else:
+              if len(value) == 0:
+                   raise ValueError('columns debe ser una lista no vacia.')
+              for c in value:
+                   if not isinstance(c, str) or not c.strip():
+                    raise ValueError(f"Los elementos de 'columns' deben ser un string no vacío.")
+    
+    @staticmethod
+    def _validate_inclusive_tuple(value: Any):
+        if not isinstance(value, tuple):
+            raise ValueError('inclusive debe ser de tipo tuple')
+        else:
+            for b in value:
+                if not isinstance(b, bool):
+                    raise ValueError("Los elementos de 'inclusive' deben ser de tipo bool")
+                
+    @staticmethod
+    def _require_dict_of_lists(value: Any, field: str):
+        
+        if not isinstance(value, dict):
+            raise ValueError(f"Se esperaba un diccionario dict[str, list], pero se recibió: {type(value).__name__}")
+        
+        if not value:
+            raise ValueError(f"{field} debe ser un diccionario no debe estar vacío.")
+        
+        for key, lst in value.items():
+            if not isinstance(key, str):
+                raise ValueError(f"Todas las claves del diccionario {field} deben ser strings. Clave inválida: {key}")
+
+            if not isinstance(lst, list):
+                raise ValueError(
+                    f"Todos los valores del diccionario {field} deben ser listas. La clave '{key}' tiene un valor de tipo: {type(lst).__name__}"
+                )
+            if not lst:
+                raise ValueError(f"La lista asociada a la clave '{key}' del diccionario {field} no debe estar vacía.")
+            
+    @staticmethod
+    def _validate_timestamp(value: Any, field: str):
+       
+        if isinstance(value, str):
+            try:
+                return datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+            except ValueError:
+                raise ValueError(
+                    f"Formato de timestamp inválido: '{value}'. "
+                    "Se esperaba 'YYYY-MM-DD HH:MM:SS'."
+                )
+
+        raise ValueError(
+            f"{field} debe ser un timestamp (datetime o string válido), pero se recibió: {type(value).__name__}"
+        )
+
+
+
+
+
 
     
     

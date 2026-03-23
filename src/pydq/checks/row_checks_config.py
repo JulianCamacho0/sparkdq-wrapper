@@ -50,7 +50,10 @@ class DateBetweenCheck(CheckConfig):
 
     def __post_init__(self):
         super().__post_init__()
-        #Pendiente validadciones
+        self._validate_columns(value=self.columns)
+        self._validate_date(self.min_value, 'min_value')
+        self._validate_date(self.max_value, 'max_value')
+        self._validate_inclusive_tuple(self.inclusive)
 
 ################################        
 ######## DateMaxCheck ##########
@@ -64,7 +67,10 @@ class DateMaxCheck(CheckConfig):
 
     def __post_init__(self):
         super().__post_init__()
-        #Pendiente validaciones 
+        self._validate_columns(self.columns)
+        self._validate_date(self.max_value, 'max_value')
+        if not isinstance(self.inclusive, bool):
+            raise ValueError("inclusive debe ser de tipo bool")
 
 ################################        
 ######## DateMinCheck ##########
@@ -78,7 +84,10 @@ class DateMinCheck(CheckConfig):
 
     def __post_init__(self):
         super().__post_init__()
-        #Pendiente validaciones adicionales
+        self._validate_columns(self.columns)
+        self._validate_date(self.min_value, 'min_value')
+        if not isinstance(self.inclusive, bool):
+            raise ValueError("inclusive debe ser de tipo bool")
 
 ##########################################        
 ##### ExactlyOneNotNullCheckConfig #######
@@ -90,7 +99,7 @@ class ExactlyOneNotNullCheckConfig(CheckConfig):
 
     def __post_init__(self):
         super().__post_init__()
-        #Pendiente otras validaciones
+        self._validate_columns(self.columns)
 
 ##########################################        
 ######### IsContainedInCheck #############
@@ -102,7 +111,7 @@ class IsContainedInCheck(CheckConfig):
 
     def __post_init__(self):
         super().__post_init__()
-        #Pendiente otras validaciones
+        self._require_dict_of_lists(self.allowed_values, 'allowed_values')
 
 ##########################################        
 ######### IsNotContainedInCheck ##########
@@ -114,10 +123,10 @@ class IsNotContainedInCheck(CheckConfig):
 
     def __post_init__(self):
         super().__post_init__()
-        #Pendiente otras validaciones
+        self._require_dict_of_lists(self.forbidden_values, 'forbidden_values')
 
 ################################        
-##### NotNullCheck #######
+##### NotNullCheck #############
 ################################
 @dataclass(kw_only=True)
 class NotNullCheck(CheckConfig):
@@ -126,8 +135,7 @@ class NotNullCheck(CheckConfig):
     
     def __post_init__(self):
         super().__post_init__()
-        if len(self.columns) == 0:
-            raise ValueError("'columns' debe ser una lista no vacía.")
+        self._validate_columns(self.columns)
         
 ################################        
 ######### NullCheck ###########
@@ -139,8 +147,7 @@ class NullCheck(CheckConfig):
     
     def __post_init__(self):
         super().__post_init__()
-        if len(self.columns) == 0:
-            raise ValueError("'columns' debe ser una lista no vacía.")
+        self._validate_columns(self.columns)
         
 ##########################################        
 ######### NumericBetweenCheck ##########
@@ -155,7 +162,12 @@ class NumericBetweenCheck(CheckConfig):
 
     def __post_init__(self):
         super().__post_init__()
-        #Pendiente otras validaciones
+        self._validate_columns(self.columns)
+        self._validate_inclusive_tuple(self.inclusive)
+        if not isinstance(self.min_value, (int, float, Decimal)):
+            raise ValueError(f'min_value debe ser de tipo float o int o Decimal')
+        if not isinstance(self.max_value, (int, float, Decimal)):
+            raise ValueError(f'max_value deber ser de tipo float o int o Decimal')
 
 ##########################################        
 ############ NumericMaxCheck #############
@@ -169,7 +181,11 @@ class NumericMaxCheck(CheckConfig):
 
     def __post_init__(self):
         super().__post_init__()
-        #Pendiente otras validaciones
+        self._validate_columns(self.columns)
+        if not isinstance(self.max_value, (int, float, Decimal)):
+            raise ValueError(f'max_value deber ser de tipo float o int o Decimal')
+        if not isinstance(self.inclusive, bool):
+            raise ValueError("inclusive debe ser de tipo bool")
 
 ##########################################        
 ############ NumericMinCheck #############
@@ -183,14 +199,19 @@ class NumericMinCheck(CheckConfig):
 
     def __post_init__(self):
         super().__post_init__()
-        #Pendiente otras validaciones
+        self._validate_columns(self.columns)
+        if not isinstance(self.min_value, (int, float, Decimal)):
+            raise ValueError(f'min_value deber ser de tipo float o int o Decimal')
+        if not isinstance(self.inclusive, bool):
+            raise ValueError("inclusive debe ser de tipo bool")
+
 
 ##########################################        
 ############ RegexMatchCheck #############
 ##########################################
 @dataclass(kw_only=True)
 class RegexMatchCheck(CheckConfig):
-    columns: str
+    column: str
     pattern: str
     ignore_case: bool = False
     treat_null_as_failure: bool = False
@@ -198,14 +219,19 @@ class RegexMatchCheck(CheckConfig):
 
     def __post_init__(self):
         super().__post_init__()
-        #Pendiente otras validaciones
+        self._require_str(self.column, field='column')
+        self._require_str(self.pattern)
+        if not isinstance(self.ignore_case, bool):
+            raise ValueError("ignore_case debe ser de tipo bool")
+        if not isinstance(self.treat_null_as_failure, bool):
+            raise ValueError("treat_null_as_failure debe ser de tipo bool")
 
 ##########################################        
 ####### StringLengthBetweenCheck #########
 ##########################################
 @dataclass(kw_only=True)
 class StringLengthBetweenCheck(CheckConfig):
-    columns: str
+    column: str
     min_length: int
     max_length: int
     inclusive: tuple[bool, bool] = (True, True)
@@ -213,35 +239,49 @@ class StringLengthBetweenCheck(CheckConfig):
 
     def __post_init__(self):
         super().__post_init__()
-        #Pendiente otras validaciones
+        self._require_str(self.column, field='column')
+        self._validate_inclusive_tuple(self.inclusive)
+        if not isinstance(self.min_length, int):
+            raise ValueError(f'min_length debe ser de tipo int')
+        if not isinstance(self.max_length, int):
+            raise ValueError(f'max_length deber ser de tipo int')
 
 ##########################################        
 ########## StringMaxLengthCheck ##########
 ##########################################
 @dataclass(kw_only=True)
 class StringMaxLengthCheck(CheckConfig):
-    columns: str
+    column: str
     max_length: int
     inclusive: bool = True
     sparkdq_check: str = field(default= "string-max-length-check", init=False, repr=False)
 
     def __post_init__(self):
         super().__post_init__()
-        #Pendiente otras validaciones
+        self._require_str(self.column,'column')
+        if not isinstance(self.max_length, int):
+            raise ValueError(f'max_length deber ser de tipo int')
+        if not isinstance(self.inclusive, bool):
+            raise ValueError(f'inclusive deber ser de tipo bool')
 
 ##########################################        
 ########## StringMinLengthCheck ##########
 ##########################################
 @dataclass(kw_only=True)
 class StringMinLengthCheck(CheckConfig):
-    columns: str
+    column: str
     min_length: int
     inclusive: bool = True
     sparkdq_check: str = field(default= "string-min-length-check", init=False, repr=False)
 
     def __post_init__(self):
         super().__post_init__()
-        #Pendiente otras validaciones
+        self._require_str(self.column,'column')
+        if not isinstance(self.min_length, int):
+            raise ValueError(f'min_length deber ser de tipo int')
+        if not isinstance(self.inclusive, bool):
+            raise ValueError(f'inclusive deber ser de tipo bool')
+        
 
 ##########################################        
 ########## TimestampBetweenCheck #########
@@ -256,7 +296,10 @@ class TimestampBetweenCheck(CheckConfig):
 
     def __post_init__(self):
         super().__post_init__()
-        #Pendiente otras validaciones
+        self._validate_columns(self.columns)
+        self._validate_timestamp(self.min_value, 'min_value')
+        self._validate_timestamp(self.max_value, 'max_value')
+        self._validate_inclusive_tuple(self.inclusive)
 
 ##########################################        
 ########## TimestampMaxCheck #############
@@ -270,7 +313,10 @@ class TimestampMaxCheck(CheckConfig):
 
     def __post_init__(self):
         super().__post_init__()
-        #Pendiente otras validaciones
+        self._validate_columns(self.columns)
+        self._validate_timestamp(self.max_value, 'max_value')
+        if not isinstance(self.inclusive, bool):
+            raise ValueError('inclusive debe ser de tipo bool')
 
 ##########################################        
 ########## TimestampMinCheck #############
@@ -284,5 +330,7 @@ class TimestampMinCheck(CheckConfig):
 
     def __post_init__(self):
         super().__post_init__()
-        #Pendiente otras validaciones
-
+        self._validate_columns(self.columns)
+        self._validate_timestamp(self.min_value, 'min_value')
+        if not isinstance(self.inclusive, bool):
+            raise ValueError('inclusive debe ser de tipo bool')
