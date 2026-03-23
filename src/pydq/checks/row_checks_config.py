@@ -156,3 +156,133 @@ class NumericBetweenCheck(CheckConfig):
     def __post_init__(self):
         super().__post_init__()
         #Pendiente otras validaciones
+
+##########################################        
+############ NumericMaxCheck #############
+##########################################
+@dataclass(kw_only=True)
+class NumericMaxCheck(CheckConfig):
+    columns: List[str]
+    max_value: float | int | Decimal
+    inclusive: bool = False
+    sparkdq_check: str = field(default="numeric-max-check", init=False, repr=False)
+
+    def __post_init__(self):
+        super().__post_init__()
+        #Pendiente otras validaciones
+
+##########################################        
+############ NumericMinCheck #############
+##########################################
+@dataclass(kw_only=True)
+class NumericMinCheck(CheckConfig):
+    columns: List[str]
+    min_value: float | int | Decimal
+    inclusive: bool = False
+    sparkdq_check: str = field(default= "numeric-min-check", init=False, repr=False)
+
+    def __post_init__(self):
+        super().__post_init__()
+        #Pendiente otras validaciones
+
+##########################################        
+############ RegexMatchCheck #############
+##########################################
+@dataclass(kw_only=True)
+class RegexMatchCheck(CheckConfig):
+    columns: str
+    pattern: str
+    ignore_case: bool = False
+    treat_null_as_failure: bool = False
+    sparkdq_check: str = field(default= "regex-match-check", init=False, repr=False)
+
+    def __post_init__(self):
+        super().__post_init__()
+        #Pendiente otras validaciones
+
+##########################################        
+####### StringLengthBetweenCheck #########
+##########################################
+@dataclass(kw_only=True)
+class StringLengthBetweenCheck(CheckConfig):
+    columns: str
+    min_length: int
+    max_length: int
+    inclusive: tuple[bool, bool] = (True, True)
+    sparkdq_check: str = field(default= "string-length-between-check", init=False, repr=False)
+
+    def __post_init__(self):
+        super().__post_init__()
+        #Pendiente otras validaciones
+
+##########################################        
+########## StringMaxLengthCheck ##########
+##########################################
+@dataclass(kw_only=True)
+class StringMaxLengthCheck(CheckConfig):
+    columns: str
+    max_length: int
+    inclusive: bool = True
+    sparkdq_check: str = field(default= "string-max-length-check", init=False, repr=False)
+
+    def __post_init__(self):
+        super().__post_init__()
+        #Pendiente otras validaciones
+
+##########################################        
+########## StringMinLengthCheck ##########
+##########################################
+@dataclass(kw_only=True)
+class StringMinLengthCheck(CheckConfig):
+    columns: str
+    min_length: int
+    inclusive: bool = True
+    sparkdq_check: str = field(default= "string-min-length-check", init=False, repr=False)
+
+    def __post_init__(self):
+        super().__post_init__()
+        #Pendiente otras validaciones
+
+##########################################        
+########## TimestampBetweenCheck #########
+##########################################
+@dataclass(kw_only=True)
+class TimestampBetweenCheck(CheckConfig):
+    columns: List[str]
+    min_value: str
+    max_value: str
+    inclusive: tuple[bool, bool]
+    sparkdq_check: str = field(default= "timestamp-between-check", init=False, repr=False)
+
+    def __post_init__(self):
+        super().__post_init__()
+        #Pendiente otras validaciones
+
+##########################################        
+########## TimestampMaxCheck #############
+##########################################
+@dataclass(kw_only=True)
+class TimestampMaxCheck(CheckConfig):
+    columns: List[str]
+    max_value: str
+    inclusive: bool = False
+    sparkdq_check: str = field(default= "timestamp-max-check", init=False, repr=False)
+
+    def __post_init__(self):
+        super().__post_init__()
+        #Pendiente otras validaciones
+
+##########################################        
+########## TimestampMinCheck #############
+##########################################
+@dataclass(kw_only=True)
+class TimestampMinCheck(CheckConfig):
+    columns: List[str]
+    min_value: str
+    inclusive: bool = False
+    sparkdq_check: str = field(default= "timestamp-min-check", init=False, repr=False)
+
+    def __post_init__(self):
+        super().__post_init__()
+        #Pendiente otras validaciones
+
